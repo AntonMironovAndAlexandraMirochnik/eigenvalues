@@ -7,7 +7,7 @@
 #define NULL 0
 #endif
 
-typedef long double MatrixElement;
+typedef double MatrixElement;
 typedef int MatrixFlags;
 typedef int Index;
 

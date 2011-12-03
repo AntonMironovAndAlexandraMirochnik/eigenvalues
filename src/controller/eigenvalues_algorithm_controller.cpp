@@ -87,7 +87,7 @@ void EigenvaluesAlgorithmController::randomizeMatrix()
     if (nullptr == oldModel)
     {
 	EditableMatrix *matrix = new EditableMatrix(N, N);
-	matrix->randomizeValues();
+        matrix->randomizeSymmetricValues();
 	model = new MatrixModel(matrix);
 	ui()->computePushButton->setEnabled(true);
     }

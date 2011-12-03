@@ -175,7 +175,7 @@ void ComparationController::startTest()
 
 	if (nullptr == matrixes[matrixIndex])
 	{
-	    matrixes[matrixIndex] = Matrix::MatrixRandomized(matrixDimention, matrixDimention);
+            matrixes[matrixIndex] = Matrix::MatrixSymmetricRandomized(matrixDimention);
 	}
 	else
 	{

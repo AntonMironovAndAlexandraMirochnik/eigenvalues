@@ -7,6 +7,7 @@ class TaskDelegate;
 
 class Task : public QRunnable
 {
+    Q_DECLARE_TR_FUNCTIONS(Task)
 public:
     enum
     {

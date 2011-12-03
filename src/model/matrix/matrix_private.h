@@ -6,9 +6,11 @@
 #include <QtCore>
 enum
 {
-    MatrixFlagInit      = 0,
-    MatrixFlagIsValid     = 1 << 0,
-    MatrixFlagIsSqure     = 1 << 1
+    MatrixFlagInit                  = 0,
+    MatrixFlagIsValid               = 1 << 0,
+    MatrixFlagIsSqure               = 1 << 1,
+    MatrixFlagIsSymmetric           = 1 << 2,
+    MatrixFlagSymmeticWasChecked    = 1 << 3
 };
 
 class MatrixPrivate

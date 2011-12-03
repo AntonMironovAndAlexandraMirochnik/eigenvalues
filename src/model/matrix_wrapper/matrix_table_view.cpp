@@ -29,6 +29,7 @@ void MatrixTableView::setModel(MatrixModel *model)
     {
 	setColumnWidth(i, rowHeight(i) + 20);
     }
+    emit modelChanged();
 }
 
 MatrixModel* MatrixTableView::model()const

@@ -32,6 +32,9 @@ public:
     bool isSaveingEnabled() const;
     void setSaveingEnabled(bool isEnabled);
 
+signals:
+    void modelChanged();
+
 private slots:
     void openFromFile();
     void saveToFile();

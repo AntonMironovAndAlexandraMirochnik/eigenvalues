@@ -46,6 +46,7 @@ void EigenvaluesAlgorithmController::setupWidget()
     connect(ui()->computePushButton, SIGNAL(pressed()), this, SLOT(compute()));
     connect(ui()->setupMatrixPushButton, SIGNAL(pressed()), this, SLOT(setupMatrix()));
     connect(ui()->randomizeMatrixPushButton, SIGNAL(pressed()), this, SLOT(randomizeMatrix()));
+    connect(ui()->initialMatrixTableView, SIGNAL(modelChanged()), this, SLOT(initialMatrixTableViewModelChanged()));
 
     connect(this, SIGNAL(taskStartedSignal(EigenvaluesTask*)), this, SLOT(taskDidStart(EigenvaluesTask*)));
     connect(this, SIGNAL(taskFinishedSignal(EigenvaluesTask*)), this, SLOT(taskDidFinish(EigenvaluesTask*)));
@@ -67,7 +68,6 @@ void EigenvaluesAlgorithmController::setupMatrix()
     if (nullptr == oldModel)
     {
 	model = new MatrixModel(new EditableMatrix(N, N));
-	ui()->computePushButton->setEnabled(true);
     }
     else
     {
@@ -89,7 +89,6 @@ void EigenvaluesAlgorithmController::randomizeMatrix()
 	EditableMatrix *matrix = new EditableMatrix(N, N);
         matrix->randomizeSymmetricValues();
 	model = new MatrixModel(matrix);
-	ui()->computePushButton->setEnabled(true);
     }
     else
     {
@@ -112,21 +111,15 @@ void EigenvaluesAlgorithmController::taskFinished(Task *task)
     emit taskFinishedSignal((EigenvaluesTask *)task);
 }
 
+void EigenvaluesAlgorithmController::initialMatrixTableViewModelChanged()
+{
+    ui()->computePushButton->setEnabled(true);
+}
+
+
 void EigenvaluesAlgorithmController::taskDidStart(EigenvaluesTask *task)
 {
-    ui()->resultAccuracy->setText(tr("Computing..."));
-    ui()->computingTimeLineEdit->setText(tr("Computing..."));
-    ui()->iterationsNumberLineEdit->setText(tr("Computing..."));
-
-    ui()->initialMatrixTableView->setEnabled(false);
-    ui()->resultMatrixTableView->setEnabled(false);
-    ui()->matrixDimentionSpinBox->setEnabled(false);
-    ui()->calculationAccuracySpinBox->setEnabled(false);
-    ui()->setupMatrixPushButton->setEnabled(false);
-    ui()->randomizeMatrixPushButton->setEnabled(false);
-
-    ui()->computePushButton->setEnabled(false);
-    ui()->computePushButton->setText(computePushButtonComputingText);
+    setProcessing(true);
 }
 
 void EigenvaluesAlgorithmController::taskDidFinish(EigenvaluesTask *task)
@@ -147,14 +140,34 @@ void EigenvaluesAlgorithmController::taskDidFinish(EigenvaluesTask *task)
 
     delete task;
 
-    ui()->initialMatrixTableView->setEnabled(true);
-    ui()->resultMatrixTableView->setEnabled(true);
-    ui()->matrixDimentionSpinBox->setEnabled(true);
-    ui()->calculationAccuracySpinBox->setEnabled(true);
-    ui()->setupMatrixPushButton->setEnabled(true);
-    ui()->randomizeMatrixPushButton->setEnabled(true);
-
-    ui()->computePushButton->setEnabled(true);
-    ui()->computePushButton->setText(computePushButtonReadyText);
+    setProcessing(false);
 }
 
+bool EigenvaluesAlgorithmController::isProcessing() const
+{
+    return _isProcessing;
+}
+
+void EigenvaluesAlgorithmController::setProcessing(bool isProcessing)
+{
+    _isProcessing = isProcessing;
+    ui()->initialMatrixTableView->setEnabled(!isProcessing);
+    ui()->resultMatrixTableView->setEnabled(!isProcessing);
+    ui()->matrixDimentionSpinBox->setEnabled(!isProcessing);
+    ui()->calculationAccuracySpinBox->setEnabled(!isProcessing);
+    ui()->setupMatrixPushButton->setEnabled(!isProcessing);
+    ui()->randomizeMatrixPushButton->setEnabled(!isProcessing);
+
+    ui()->computePushButton->setEnabled(!isProcessing);
+    if (isProcessing)
+    {
+	ui()->computePushButton->setText(computePushButtonComputingText);
+	ui()->resultAccuracy->setText(tr("Computing..."));
+	ui()->computingTimeLineEdit->setText(tr("Computing..."));
+	ui()->iterationsNumberLineEdit->setText(tr("Computing..."));
+    }
+    else
+    {
+	ui()->computePushButton->setText(computePushButtonReadyText);
+    }
+}

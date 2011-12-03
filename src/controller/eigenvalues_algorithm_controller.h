@@ -12,12 +12,14 @@ namespace Ui
 class EigenvaluesAlgorithmController : public QObject, public TaskDelegate
 {
     Q_OBJECT
+    Q_PROPERTY (bool processing READ isProcessing WRITE setProcessing)
 
 private:
     QWidget *_widget;
     Ui::EigenvaluesWidget *_ui;
     QString computePushButtonReadyText;
     QString computePushButtonComputingText;
+    bool _isProcessing;
 
     void setupWidget();
 
@@ -34,6 +36,9 @@ public:
     void taskStarted(Task *task);
     void taskFinished(Task *task);
 
+    bool isProcessing() const;
+    void setProcessing(bool isProcessing);
+
 signals:
     void taskStartedSignal(EigenvaluesTask *task);
     void taskFinishedSignal(EigenvaluesTask *task);
@@ -45,6 +50,8 @@ private slots:
 
     void taskDidStart(EigenvaluesTask *task);
     void taskDidFinish(EigenvaluesTask *task);
+
+    void initialMatrixTableViewModelChanged();
 };
 
 #endif // EIGENVALUESALGORITHMCONTROLLER_H

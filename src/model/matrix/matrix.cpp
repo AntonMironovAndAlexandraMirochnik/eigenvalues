@@ -98,6 +98,34 @@ Matrix* Matrix::MatrixRandomized(int M, int N, qreal minValue, qreal maxValue)
     return matrix;
 }
 
+Matrix* Matrix::MatrixSymmetricRandomized(int N, qreal minValue, qreal maxValue)
+{
+    Matrix* matrix = new Matrix(N, N);
+    qreal value;
+    Index i, j;
+    for (i = 0; i < N; ++i)
+    {
+	for (j = i; j < N; ++j)
+	{
+	    value = minValue + ((qreal)qrand() / (qreal)RAND_MAX) * (maxValue - minValue);
+	    matrix->matrixPrivate.setElement(i, j, value);
+	    matrix->matrixPrivate.setElement(j, i, value);
+	}
+    }
+    return matrix;
+}
+
+Matrix* Matrix::MatrixIdentical(int M, int N)
+{
+    Matrix* matrix = new Matrix(N, N, 0.0);
+    Index i;
+    for (i = 0; i < N && i < M; ++i)
+    {
+	matrix->matrixPrivate.setElement(i, i, 1.0);
+    }
+    return matrix;
+}
+
 
 Index Matrix::M() const {return matrixPrivate.sizeM;}
 Index Matrix::N() const {return matrixPrivate.sizeN;}
@@ -112,6 +140,34 @@ void Matrix::setElement(Index i, Index j, MatrixElement value)
     matrixPrivate.setElement(i, j, value);
 }
 
+Matrix::Element Matrix::maximalNondiagonalElementIndex()
+{
+    Index i, j;
+    MatrixElement value;
+
+    Index maxI, maxJ;
+    MatrixElement maxValue = 0;
+
+    for (i = 0; i < N(); ++i)
+    {
+	for (j = i + 1; j < N(); ++j)
+	{
+	    value = qAbs(element(i, j));
+	    if (value > maxValue)
+	    {
+		maxI = i;
+		maxJ = j;
+		maxValue = value;
+	    }
+	}
+    }
+    Element element;
+    element.i = maxI;
+    element.j = maxJ;
+    element.owner = this;
+    return element;
+}
+
 bool Matrix::isValid() const
 {
     return (matrixPrivate.matrixFlags & MatrixFlagIsValid);
@@ -120,6 +176,30 @@ bool Matrix::isValid() const
 bool Matrix::isSquare() const
 {
     return (matrixPrivate.matrixFlags & MatrixFlagIsSqure);
+}
+
+bool Matrix::isSymmetric()
+{
+    if (!(matrixPrivate.matrixFlags & MatrixFlagSymmeticWasChecked))
+    {
+	bool isSymmetric = true;
+	Index i, j;
+	for (i = 0; i < N(); ++i)
+	{
+	    for (j = i; j < N(); ++j)
+	    {
+		if (!qFuzzyCompare(element(i, j), element(j, i)))
+		{
+		    isSymmetric = false;
+		    break;
+		}
+	    }
+	}
+	if (isSymmetric)
+	    matrixPrivate.matrixFlags |= MatrixFlagIsSymmetric;
+    }
+
+    return (matrixPrivate.matrixFlags & MatrixFlagIsSymmetric);
 }
 
 QString Matrix::toString() const

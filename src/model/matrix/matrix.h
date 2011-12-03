@@ -25,6 +25,8 @@ public:
 
     static Matrix* MatrixFromFile(QString fileName);
     static Matrix* MatrixRandomized(int M, int N, qreal minValue = 0, qreal maxValue = 1);
+    static Matrix* MatrixSymmetricRandomized(int N, qreal minValue = 0, qreal maxValue = 1);
+    static Matrix* MatrixIdentical(int M, int N);
 
     Index M() const;
     Index N() const;
@@ -34,8 +36,18 @@ public:
     Matrix transposed() const;
     Matrix inverted() const;
 
+
+    struct Element
+    {
+	Index i, j;
+	Matrix* owner;
+    };
+
+    Element maximalNondiagonalElementIndex();
+
     bool isValid() const;
     bool isSquare() const;
+    bool isSymmetric();
 
     static void solveLinearByGauss(Matrix &A, Matrix &B);
 

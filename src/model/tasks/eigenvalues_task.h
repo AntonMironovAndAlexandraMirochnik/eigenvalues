@@ -9,12 +9,10 @@
 class EigenvaluesTask : public Task
 {
 private:
-    //input
     Matrix _initialMatrix;
     volatile int _computationAccuracy;
     volatile qreal _epsilon;
 
-    //output
     Matrix _eigenvalues;
     volatile int _iterationsNumber;
     volatile qreal _resultAccuracy;
@@ -24,11 +22,12 @@ protected:
     void done(const Matrix &eigenvalues, int iterationsNumber, qreal resultAccuracy);
 
 public:
-
-    const Matrix& initialMatrix();
+    //input
+    Matrix& initialMatrix();
     int computationAccuracy() const;
-    int epsilon() const;
+    qreal epsilon() const;
 
+    //output
     const Matrix& eigenvalues();
     int iterationsNumber() const;
     qreal resultAccuracy() const;

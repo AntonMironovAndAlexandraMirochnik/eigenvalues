@@ -4,10 +4,10 @@ EigenvaluesTask::EigenvaluesTask(const Matrix &initialMatrix, int computationAcc
     : Task(taskType), _initialMatrix(initialMatrix)
 {
     _computationAccuracy = computationAccuracy;
-    _epsilon = qPow(10, _computationAccuracy);
+    _epsilon = qPow(10, -_computationAccuracy);
 }
 
-const Matrix& EigenvaluesTask::initialMatrix()
+Matrix& EigenvaluesTask::initialMatrix()
 {
     QMutexLocker locker(&mutex);
     return _initialMatrix;
@@ -18,7 +18,7 @@ int EigenvaluesTask::computationAccuracy() const
     return _computationAccuracy;
 }
 
-int EigenvaluesTask::epsilon() const
+qreal EigenvaluesTask::epsilon() const
 {
     return _epsilon;
 }

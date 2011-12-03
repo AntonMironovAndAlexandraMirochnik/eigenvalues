@@ -140,10 +140,25 @@ void EditableMatrix::randomizeValues(qreal minValue, qreal maxValue)
     Index i, j;
     for (i = 0; i < M(); ++i)
     {
-	for (j = 0; j < N(); ++j)
-	{
-	    element(i, j) = minValue + ((qreal)qrand() / (qreal)RAND_MAX) * (maxValue - minValue);
-	}
+        for (j = 0; j < N(); ++j)
+        {
+            element(i, j) = minValue + ((qreal)qrand() / (qreal)RAND_MAX) * (maxValue - minValue);
+        }
+    }
+}
+
+void EditableMatrix::randomizeSymmetricValues(qreal minValue, qreal maxValue)
+{
+    Index i, j;
+    qreal value;
+    for (i = 0; i < M(); ++i)
+    {
+        for (j = 0; j < N(); ++j)
+        {
+            value = minValue + ((qreal)qrand() / (qreal)RAND_MAX) * (maxValue - minValue);
+            element(i, j) = value;
+            element(j, i) = value;
+        }
     }
 }
 

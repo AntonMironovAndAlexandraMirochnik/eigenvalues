@@ -31,6 +31,7 @@ public:
     MatrixElement& element(Index i, Index j);
     void setElement(Index i, Index j, MatrixElement value);
     void randomizeValues(qreal minValue = 0, qreal maxValue = 1);
+    void randomizeSymmetricValues(qreal minValue = 0, qreal maxValue = 1);
 
     void swapRows(Index rowOne, Index rowTwo);
     void swapCols(Index colOne, Index colTwo);

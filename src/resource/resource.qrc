@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/images">
+        <file alias="logo">logo.png</file>
+        <file alias="compute">compute.png</file>
+        <file alias="random">random.png</file>
+        <file alias="setup">setup.png</file>
+        <file alias="stop">stop.png</file>
+    </qresource>
+</RCC>

@@ -23,8 +23,8 @@ void QRTask::run()
 	for (i = j + 1; i < A.N(); i++)
 	{
 	    MatrixElement s, c;
-	    s = A.element(i, j - 1) / qSqrt(qPow(A.element(j, j-1), 2) + qPow(A.element(i, j-1), 2));
-	    c = - A.element(j, j - 1) / qSqrt(qPow(A.element(j, j-1), 2) + qPow(A.element(i, j-1), 2));
+	    s = A.element(i, j - 1) / qSqrt(qPow(A.element(j, j - 1), 2) + qPow(A.element(i, j - 1), 2));
+	    c = - (A.element(j, j - 1) / qSqrt(qPow(A.element(j, j - 1), 2) + qPow(A.element(i, j - 1), 2)));
 
 	    EditableMatrix T(*Matrix::MatrixIdentical(A.N(), A.N()));
 	    T.element(i, i) = c;

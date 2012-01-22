@@ -186,13 +186,15 @@ bool Matrix::isSymmetric()
 	Index i, j;
 	for (i = 0; i < N(); ++i)
 	{
-	    for (j = i; j < N(); ++j)
+        for (j = i + 1; j < N(); ++j)
 	    {
-		if (!qFuzzyCompare(element(i, j), element(j, i)))
-		{
-		    isSymmetric = false;
-		    break;
-		}
+            MatrixElement a = element(i, j);
+            MatrixElement b = element(j, i);
+            if (!qFuzzyCompare(a, b))
+            {
+                isSymmetric = false;
+                break;
+            }
 	    }
 	}
 	if (isSymmetric)

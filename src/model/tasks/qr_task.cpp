@@ -1,75 +1,77 @@
-#include "QR_task.h"
+#include "eigenvalues_task.h"
 #include "model/matrix/editable_matrix.h"
 
-QRTask::QRTask(const Matrix &initialMatrix, int computationAccuracy)
-    : EigenvaluesTask(initialMatrix, computationAccuracy, Task::QRTaskType)
+EigenvaluesResult solveWithQR(const EigenvaluesTask &task)
 {
-}
-
-void QRTask::run()
-{
-    startTask();
+    QTime time;
+    time.start();
 
     //output
-    EditableMatrix eigenvaluesMatrix(initialMatrix().M(), 1);
+    EditableMatrix eigenvaluesMatrix(task.matrix().M(), 1);
     int iterationsNumber = 0;
     qreal resultAccuracy = HUGE_VALUE;
 
-    Matrix A(initialMatrix());
+    Matrix A(task.matrix());
     Index i, j;
 
     for (j = 1; j < A.N(); j++)
     {
-	for (i = j + 1; i < A.N(); i++)
-	{
-	    MatrixElement s, c;
-	    s = A.element(i, j - 1) / qSqrt(qPow(A.element(j, j - 1), 2) + qPow(A.element(i, j - 1), 2));
-	    c = - (A.element(j, j - 1) / qSqrt(qPow(A.element(j, j - 1), 2) + qPow(A.element(i, j - 1), 2)));
+        for (i = j + 1; i < A.N(); i++)
+        {
+            MatrixElement s, c;
+            s = A.element(i, j - 1) / qSqrt(qPow(A.element(j, j - 1), 2) + qPow(A.element(i, j - 1), 2));
+            c = - (A.element(j, j - 1) / qSqrt(qPow(A.element(j, j - 1), 2) + qPow(A.element(i, j - 1), 2)));
 
-	    EditableMatrix T(*Matrix::MatrixIdentical(A.N(), A.N()));
-	    T.element(i, i) = c;
-	    T.element(i, j) = -s;
-	    T.element(j, i) = s;
-	    T.element(j, j) = c;
+            EditableMatrix T(*Matrix::MatrixIdentical(A.N(), A.N()));
+            T.element(i, i) = c;
+            T.element(i, j) = -s;
+            T.element(j, i) = s;
+            T.element(j, j) = c;
 
-	    A = T.transposed() * A * T;
-	}
+            A = T.transposed() * A * T;
+        }
     }
 
     for (;;)
     {
-	Matrix::Element maxElementIndex = A.maximalNondiagonalElementIndex();
-	resultAccuracy = qPow(A.element(maxElementIndex.i, maxElementIndex.j), 2);
-	if (resultAccuracy < epsilon()) break;
+        Matrix::Element maxElementIndex = A.maximalNondiagonalElementIndex();
+        resultAccuracy = qPow(A.element(maxElementIndex.i, maxElementIndex.j), 2);
+        if (resultAccuracy < task.epsilon()) break;
 
-	++iterationsNumber;
-	Matrix R(A);
-	Matrix Q(*Matrix::MatrixIdentical(A.N(), A.N()));
-	for (j = 0; j < A.N() - 1; j++)
-	{
-	    for (i = j + 1; i < A.N(); i++)
-	    {
-		MatrixElement s, c;
-		s = A.element(i, j) / qSqrt(qPow(A.element(j, i), 2) + qPow(A.element(i, i), 2));
-		c = - A.element(i, i) / qSqrt(qPow(A.element(j, i), 2) + qPow(A.element(i, i), 2));
+        ++iterationsNumber;
+        Matrix R(A);
+        Matrix Q(*Matrix::MatrixIdentical(A.N(), A.N()));
+        for (j = 0; j < A.N(); j++)
+        {
+            for (i = j + 1; j < A.N(); j++)
+            {
+                MatrixElement s, c;
 
-		EditableMatrix T(*Matrix::MatrixIdentical(A.N(), A.N()));
-		T.element(i, i) = c;
-		T.element(i, j) = -s;
-		T.element(j, i) = s;
-		T.element(j, j) = c;
+                MatrixElement a_ii = A.element(i, i);
+                MatrixElement a_ji = A.element(j, i);
+                MatrixElement div = qSqrt(qPow(a_ii, 2) + qPow(a_ji, 2));
 
-		R = T * R;
-		Q = Q * T.transposed();
-	    }
-	}
-	A = R * Q;
+                s = a_ji / div;
+                c = a_ii / div;
+
+                EditableMatrix T(*Matrix::MatrixIdentical(A.N(), A.N()));
+                T.element(i, i) = c;
+                T.element(i, j) = -s;
+                T.element(j, i) = s;
+                T.element(j, j) = c;
+
+                R = T * R;
+                Q = Q * T.transposed();
+            }
+        }
+        A = R * Q;
     }
 
     for (i = 0; i < A.N(); ++i)
     {
-	eigenvaluesMatrix.element(i, 0) = A.element(i, i);
+        eigenvaluesMatrix.element(i, 0) = A.element(i, i);
     }
-    done(eigenvaluesMatrix, iterationsNumber, resultAccuracy);
+
+    return EigenvaluesResult(eigenvaluesMatrix, iterationsNumber, resultAccuracy, time.elapsed());
 }
 

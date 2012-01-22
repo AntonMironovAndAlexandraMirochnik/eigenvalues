@@ -9,7 +9,8 @@ class QRAlgorithmController : public EigenvaluesAlgorithmController
 
 public:
     explicit QRAlgorithmController(QObject *parent = 0);
-    virtual EigenvaluesTask* generateTask(const Matrix &initialMatrix, int computationAccuracy);
+    virtual TaskType taskType() const;
+
 };
 
 #endif // QR_ALGORITHM_CONTROLLER_H

@@ -1,21 +1,18 @@
 #include "eigenvalues_task.h"
-
 EigenvaluesTask::EigenvaluesTask(const Matrix &initialMatrix, int computationAccuracy, TaskType taskType)
-    : Task(taskType), _initialMatrix(initialMatrix)
+    : _matrix(initialMatrix), _accuracy(computationAccuracy), _taskType(taskType)
 {
-    _computationAccuracy = computationAccuracy;
-    _epsilon = qPow(10, -_computationAccuracy);
+    _epsilon = qPow(10, -_accuracy);
 }
 
-Matrix& EigenvaluesTask::initialMatrix()
+const Matrix& EigenvaluesTask::matrix() const
 {
-    QMutexLocker locker(&mutex);
-    return _initialMatrix;
+    return _matrix;
 }
 
-int EigenvaluesTask::computationAccuracy() const
+int EigenvaluesTask::accuracy() const
 {
-    return _computationAccuracy;
+    return _accuracy;
 }
 
 qreal EigenvaluesTask::epsilon() const
@@ -23,29 +20,55 @@ qreal EigenvaluesTask::epsilon() const
     return _epsilon;
 }
 
-void EigenvaluesTask::done(const Matrix &eigenvalues, int iterationsNumber, qreal resultAccuracy)
+EigenvaluesResult EigenvaluesTask::solve() const
 {
-    mutex.lock();
-    _eigenvalues = eigenvalues;
+    Q_ASSERT(taskType() != InvalidTaskType);
+    switch (taskType())
+    {
+    case JacobiTaskType:
+        return solveWithJacobi(*this);
+    break;
+    case QRTaskType:
+        return solveWithQR(*this);
+    break;
+    }
+    return EigenvaluesResult();
+}
+
+EigenvaluesResult::EigenvaluesResult() : _isValid(false)
+{
+
+}
+
+EigenvaluesResult::EigenvaluesResult(const Matrix &eigenvalues, int iterationsNumber, qreal resultAccuracy, int completionTime) : _isValid(true)
+{
+    _matrix = eigenvalues;
     _iterationsNumber = iterationsNumber;
-    _resultAccuracy = resultAccuracy;
-    mutex.unlock();
-    finishTask();
+    _accuracy = resultAccuracy;
+    _completionTime = completionTime;
 }
 
-const Matrix& EigenvaluesTask::eigenvalues()
+const Matrix& EigenvaluesResult::matrix() const
 {
-    QMutexLocker locker(&mutex);
-    return _eigenvalues;
+    return _matrix;
 }
 
-int EigenvaluesTask::iterationsNumber() const
+int EigenvaluesResult::iterationsNumber() const
 {
     return _iterationsNumber;
 }
 
-qreal EigenvaluesTask::resultAccuracy() const
+qreal EigenvaluesResult::accuracy() const
 {
-    return _resultAccuracy;
+    return _accuracy;
 }
 
+int EigenvaluesResult::completionTime() const
+{
+    return _completionTime;
+}
+
+bool EigenvaluesResult::isValid() const
+{
+    return _isValid;
+}

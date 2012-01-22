@@ -1,5 +1,7 @@
 #include "jacobi_algorithm_controller.h"
-#include "model/tasks/jacobi_task.h"
+#include "model/tasks/eigenvalues_task.h"
+#include "model/matrix_wrapper/matrix_model.h"
+#include "model/matrix/editable_matrix.h"
 
 JacobiAlgorithmController::JacobiAlgorithmController(QObject *parent)
     :EigenvaluesAlgorithmController(parent)
@@ -7,8 +9,7 @@ JacobiAlgorithmController::JacobiAlgorithmController(QObject *parent)
     widget()->setWindowTitle(tr("Jakobi algorithm"));
 }
 
-EigenvaluesTask* JacobiAlgorithmController::generateTask(const Matrix &initialMatrix, int computationAccuracy)
+TaskType JacobiAlgorithmController::taskType() const
 {
-    return new JacobiTask(initialMatrix, computationAccuracy);
+    return JacobiTaskType;
 }
-

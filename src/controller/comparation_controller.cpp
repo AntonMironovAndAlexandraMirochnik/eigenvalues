@@ -1,13 +1,37 @@
 #include "comparation_controller.h"
 #include "ui_comparation_widget.h"
 #include "model/matrix/editable_matrix.h"
-#include "model/tasks/qr_task.h"
-#include "model/tasks/jacobi_task.h"
 
 ComparationController::ComparationController(QObject *parent) :
     QObject(parent)
 {
     setupWidget();
+
+    connect(ui()->computePushButton, SIGNAL(pressed()), this, SLOT(compute()));
+    connect(ui()->stopPushButton, SIGNAL(pressed()), &qrWatcher, SLOT(cancel()));
+    connect(ui()->stopPushButton, SIGNAL(pressed()), &jacobiWatcher, SLOT(cancel()));
+
+    connect(&qrWatcher, SIGNAL(progressRangeChanged(int,int)), ui()->qrProgressBar, SLOT(setRange(int,int)));
+    connect(&jacobiWatcher, SIGNAL(progressRangeChanged(int,int)), ui()->jacobiProgressBar, SLOT(setRange(int,int)));
+
+    connect(&qrWatcher, SIGNAL(progressValueChanged(int)), ui()->qrProgressBar, SLOT(setValue(int)));
+    connect(&jacobiWatcher, SIGNAL(progressValueChanged(int)), ui()->jacobiProgressBar, SLOT(setValue(int)));
+
+    connect(ui()->qrProgressBar, SIGNAL(valueChanged(int)), this, SLOT(updateQRUi(int)));
+    connect(ui()->jacobiProgressBar, SIGNAL(valueChanged(int)), this, SLOT(updateJacobiUi(int)));
+
+    connect(widget(), SIGNAL(destroyed()), &qrWatcher, SLOT(cancel()));
+    connect(widget(), SIGNAL(destroyed()), &jacobiWatcher, SLOT(cancel()));
+    connect(widget(), SIGNAL(destroyed()), &tasksWatcher, SLOT(cancel()));
+
+    connect(&qrWatcher, SIGNAL(finished()), this , SLOT(updateUi()));
+    connect(&jacobiWatcher, SIGNAL(finished()), this , SLOT(updateUi()));
+
+    connect(&qrWatcher, SIGNAL(resultReadyAt(int)), this, SLOT(collectQRData(int)));
+    connect(&jacobiWatcher, SIGNAL(resultReadyAt(int)), this, SLOT(collectJacobiData(int)));
+
+    connect(&tasksWatcher, SIGNAL(finished()), this, SLOT(tasksReady()));
+    connect(&tasksWatcher, SIGNAL(finished()), this, SLOT(updateUi()));
 }
 
 ComparationController::~ComparationController()
@@ -26,181 +50,115 @@ Ui::ComparationWidget* ComparationController::ui() const
     return _ui;
 }
 
-int ComparationController::tasksRunningCount() const
-{
-    return jacobiTasksRunningCount + qrTasksRunningCount;
-}
-
 void ComparationController::setupWidget()
 {
     {
-	_widget = new QWidget();
-	_ui = new Ui::ComparationWidget();
+        _widget = new QWidget();
+        _ui = new Ui::ComparationWidget();
     }
 
     ui()->setupUi(widget());
 
     ui()->stopPushButton->setEnabled(false);
-
-    connect(ui()->computePushButton, SIGNAL(pressed()), this, SLOT(compute()));
-    connect(ui()->stopPushButton, SIGNAL(pressed()), this, SLOT(stop()));
-    connect(this, SIGNAL(taskStartedSignal(EigenvaluesTask*)), this, SLOT(taskDidStart(EigenvaluesTask*)));
-    connect(this, SIGNAL(taskFinishedSignal(EigenvaluesTask*)), this, SLOT(taskDidFinish(EigenvaluesTask*)));
 }
 
 void ComparationController::compute()
 {
-    isStopping = false;
-
-    jacobiTasksRunningCount = 0;
     jacobiComputationsCompleted = 0.0;
     jacobiTotalComputionTime = 0.0;
     jacobiTotalIterationsNumber = 0.0;
     jacobiTotalResultAccuracy = 0.0;
 
-    qrTasksRunningCount = 0;
     qrComputationsCompleted = 0.0;
     qrTotalComputionTime = 0.0;
     qrTotalIterationsNumber = 0.0;
     qrTotalResultAccuracy = 0.0;
 
-    numberOfMatrixes = ui()->numberOfMatrixesSpinBox->value();
-    matrixDimention = ui()->matrixDimentionSpinBox->value();
-    computationAccuracy = ui()->computationAccuracySpinBox->value();
+    _numberOfMatrixes = ui()->numberOfMatrixesSpinBox->value();
+    _matrixDimention = ui()->matrixDimentionSpinBox->value();
+    _computationAccuracy = ui()->computationAccuracySpinBox->value();
 
-    matrixes = QVector<Matrix *>(numberOfMatrixes, nullptr);
-
-    startTest();
-    updateUi();
-}
-
-void ComparationController::stop()
-{
-    isStopping = true;
-    ui()->stopPushButton->setEnabled(!isStopping);
-}
-
-void ComparationController::taskStarted(Task *task)
-{
-    emit taskStartedSignal((EigenvaluesTask *)task);
-}
-
-void ComparationController::taskFinished(Task *task)
-{
-    emit taskFinishedSignal((EigenvaluesTask *)task);
-}
-
-void ComparationController::taskDidStart(EigenvaluesTask *task)
-{
-}
-
-void ComparationController::taskDidFinish(EigenvaluesTask *task)
-{
-    if (task->isDone())
+    tasks = new QList<GeneratedTasks>();
+    tasks->reserve(numberOfMatrixes());
+    for (int i = 0; i < numberOfMatrixes(); ++i)
     {
-	switch (task->taskType())
-	{
-	case Task::JacobiTaskType:
-	    --jacobiTasksRunningCount;
-	    ++jacobiComputationsCompleted;
-	    jacobiTotalComputionTime += task->computationTime();
-	    jacobiTotalIterationsNumber += task->iterationsNumber();
-	    jacobiTotalResultAccuracy +=task->resultAccuracy();
-	    break;
-	case Task::QRTaskType:
-	    --qrTasksRunningCount;
-	    ++qrComputationsCompleted;
-	    qrTotalComputionTime += task->computationTime();
-	    qrTotalIterationsNumber += task->iterationsNumber();
-	    qrTotalResultAccuracy +=task->resultAccuracy();
-	    break;
-	}
-    }
-    else
-    {
-	isStopping = true;
-	QMessageBox::warning(widget(), tr("Error"), tr("Solution is not found"));
+        GeneratedTasks *task = new GeneratedTasks();
+        task->accuracy = this->computationAccuracy();
+        task->dimention = this->matrixDimention();
+        task->jacobiTask = nullptr;
+        task->qrTask = nullptr;
+        *tasks << *task;
     }
 
-    delete task;
-    isStopping |= (jacobiComputationsCompleted == numberOfMatrixes) && (qrComputationsCompleted == numberOfMatrixes);
-    startTest();
-    updateUi();
+    tasksWatcher.setFuture(QtConcurrent::map(*tasks, &GeneratedTasks::generate));
+}
+
+void ComparationController::tasksReady()
+{
+    QList<EigenvaluesTask> *qrTasks = new QList<EigenvaluesTask>();
+    qrTasks->reserve(tasks->count());
+
+    QList<EigenvaluesTask> *jacobiTasks = new QList<EigenvaluesTask>();
+    jacobiTasks->reserve(tasks->count());
+
+    for (QList<GeneratedTasks>::iterator i = tasks->begin(); i!= tasks->end(); ++i)
+    {
+        GeneratedTasks &task = *i;
+        qrTasks->append(*task.qrTask);
+        jacobiTasks->append(*task.jacobiTask);
+    }
+    delete tasks;
+    tasks = nullptr;
+
+    qrWatcher.setFuture(QtConcurrent::mapped(*qrTasks, &EigenvaluesTask::solve));
+    jacobiWatcher.setFuture(QtConcurrent::mapped(*jacobiTasks, &EigenvaluesTask::solve));
 }
 
 void ComparationController::updateUi()
 {
-    bool isRunning = (tasksRunningCount() > 0);
+    bool isRunning = qrWatcher.isRunning() || jacobiWatcher.isRunning();
 
     ui()->computePushButton->setEnabled(!isRunning);
-    ui()->stopPushButton->setEnabled(!isStopping);
+    ui()->stopPushButton->setEnabled(isRunning);
     ui()->computationAccuracySpinBox->setEnabled(!isRunning);
     ui()->matrixDimentionSpinBox->setEnabled(!isRunning);
     ui()->numberOfMatrixesSpinBox->setEnabled(!isRunning);
-
-    ui()->jacobiProgressBar->setMaximum(numberOfMatrixes);
-    ui()->jacobiProgressBar->setValue(jacobiComputationsCompleted);
-    ui()->jacobiComputingTimeLineEdit->setText(tr("%1").arg((0 == jacobiComputationsCompleted) ? 0 : jacobiTotalComputionTime / jacobiComputationsCompleted));
-    ui()->jacobiResultAccuracyLineEdit->setText(tr("%1").arg((0 == jacobiComputationsCompleted) ? 0 : jacobiTotalResultAccuracy / jacobiComputationsCompleted));
-    ui()->jacobiIterationsNumberLineEdit->setText(tr("%1").arg((0 == jacobiComputationsCompleted) ? 0 : jacobiTotalIterationsNumber / jacobiComputationsCompleted));
-
-    ui()->qrProgressBar->setMaximum(numberOfMatrixes);
-    ui()->qrProgressBar->setValue(qrComputationsCompleted);
-    ui()->qrComputingTimeLineEdit->setText(tr("%1").arg((0 == qrComputationsCompleted) ? 0 : qrTotalComputionTime / qrComputationsCompleted));
-    ui()->qrResultAccuracyLineEdit->setText(tr("%1").arg((0 == qrComputationsCompleted) ? 0 : qrTotalResultAccuracy / qrComputationsCompleted));
-    ui()->qrIterationsNumberLineEdit->setText(tr("%1").arg((0 == qrComputationsCompleted) ? 0 : qrTotalIterationsNumber / qrComputationsCompleted));
 }
 
-void ComparationController::startTest()
+void ComparationController::updateQRUi(int progress)
 {
-    if (isStopping)
-    {
-	//cleanup
-	int matrixIndex = (jacobiComputationsCompleted < qrComputationsCompleted) ? jacobiComputationsCompleted : qrComputationsCompleted;
-	while (matrixIndex < matrixes.count() && nullptr != matrixes[matrixIndex])
-	{
-	    delete matrixes[matrixIndex];
-	    matrixes[matrixIndex] = nullptr;
-	}
-	return;
-    }
-
-    while (QThreadPool::globalInstance()->activeThreadCount() < QThreadPool::globalInstance()->maxThreadCount())
-    {
-	EigenvaluesTask *task = nullptr;
-	Matrix *matrix = nullptr;
-	int matrixIndex = 0;
-
-	matrixIndex = (jacobiComputationsCompleted < qrComputationsCompleted) ? jacobiComputationsCompleted : qrComputationsCompleted;
-
-	if (nullptr == matrixes[matrixIndex])
-	{
-            matrixes[matrixIndex] = Matrix::MatrixSymmetricRandomized(matrixDimention);
-	}
-	else
-	{
-	    int i = matrixIndex - 1;
-	    while (i >= 0 && nullptr != matrixes[i])
-	    {
-		delete matrixes[i];
-		matrixes[i] = nullptr;
-	    }
-	}
-
-	matrix = matrixes[matrixIndex];
-
-	if (jacobiComputationsCompleted < qrComputationsCompleted)
-	{
-	    ++jacobiTasksRunningCount;
-	    task = new JacobiTask(*matrix, computationAccuracy);
-	}
-	else
-	{
-	    ++qrTasksRunningCount;
-	    task = new QRTask(*matrix, computationAccuracy);
-	}
-
-	task->execute(this);
-    }
+    ui()->qrComputingTimeLineEdit->setText(tr("%1").arg((0 == progress) ? 0 : qrTotalComputionTime / (float)progress));
+    ui()->qrResultAccuracyLineEdit->setText(tr("%1").arg((0 == progress) ? 0 : qrTotalResultAccuracy / (float)progress));
+    ui()->qrIterationsNumberLineEdit->setText(tr("%1").arg((0 == progress) ? 0 : qrTotalIterationsNumber / (float)progress));
 }
 
+void ComparationController::updateJacobiUi(int progress)
+{
+    ui()->jacobiComputingTimeLineEdit->setText(tr("%1").arg((0 == progress) ? 0 : jacobiTotalComputionTime / (float)progress));
+    ui()->jacobiResultAccuracyLineEdit->setText(tr("%1").arg((0 == progress) ? 0 : jacobiTotalResultAccuracy / (float)progress));
+    ui()->jacobiIterationsNumberLineEdit->setText(tr("%1").arg((0 == progress) ? 0 : jacobiTotalIterationsNumber / (float)progress));
+}
+
+void ComparationController::collectQRData(int index)
+{
+    EigenvaluesResult result = qrWatcher.resultAt(index);
+    qrTotalComputionTime += result.completionTime();
+    qrTotalResultAccuracy += result.accuracy();
+    qrTotalIterationsNumber += result.iterationsNumber();
+}
+
+void ComparationController::collectJacobiData(int index)
+{
+    EigenvaluesResult result = jacobiWatcher.resultAt(index);
+    jacobiTotalComputionTime += result.completionTime();
+    jacobiTotalResultAccuracy += result.accuracy();
+    jacobiTotalIterationsNumber += result.iterationsNumber();
+}
+
+void GeneratedTasks::generate()
+{
+    Matrix* matrix = Matrix::MatrixSymmetricRandomized(dimention);
+    qrTask = new EigenvaluesTask(*matrix, accuracy, QRTaskType);
+    jacobiTask = new EigenvaluesTask(*matrix, accuracy, JacobiTaskType);
+    delete matrix;
+}

@@ -1,5 +1,5 @@
 #include "qr_algorithm_controller.h"
-#include "model/tasks/qr_task.h"
+#include "model/tasks/eigenvalues_task.h"
 
 QRAlgorithmController::QRAlgorithmController(QObject *parent)
     :EigenvaluesAlgorithmController(parent)
@@ -7,8 +7,8 @@ QRAlgorithmController::QRAlgorithmController(QObject *parent)
     widget()->setWindowTitle(tr("QR-algorithm"));
 }
 
-EigenvaluesTask* QRAlgorithmController::generateTask(const Matrix &initialMatrix, int computationAccuracy)
+TaskType QRAlgorithmController::taskType() const
 {
-    return new QRTask(initialMatrix, computationAccuracy);
+    return QRTaskType;
 }
 

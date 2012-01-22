@@ -9,7 +9,7 @@ class JacobiAlgorithmController : public EigenvaluesAlgorithmController
 
 public:
     explicit JacobiAlgorithmController(QObject *parent = 0);
-    virtual EigenvaluesTask* generateTask(const Matrix &initialMatrix, int computationAccuracy);
+    virtual TaskType taskType() const;
 };
 
 #endif // JACOBI_ALGORITHM_CONTROLLER_H

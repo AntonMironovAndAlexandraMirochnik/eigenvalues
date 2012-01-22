@@ -16,9 +16,6 @@ HEADERS += \
     controller/qr_algorithm_controller.h \
     controller/jacobi_algorithm_controller.h \
     model/tasks/eigenvalues_task.h \
-    model/tasks/task.h \
-    model/tasks/qr_task.h \
-    model/tasks/jacobi_task.h \
     controller/comparation_controller.h
 
 SOURCES += \
@@ -35,7 +32,6 @@ SOURCES += \
     controller/qr_algorithm_controller.cpp \
     controller/jacobi_algorithm_controller.cpp \
     model/tasks/eigenvalues_task.cpp \
-    model/tasks/task.cpp \
     model/tasks/qr_task.cpp \
     model/tasks/jacobi_task.cpp \
     controller/comparation_controller.cpp

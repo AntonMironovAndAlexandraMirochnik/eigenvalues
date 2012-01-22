@@ -154,7 +154,7 @@
          <set>Qt::AlignCenter</set>
         </property>
         <property name="format">
-         <string>%p of %m matrixes</string>
+         <string>%v of %m matrixes</string>
         </property>
        </widget>
       </item>
@@ -226,7 +226,7 @@
          <enum>QProgressBar::TopToBottom</enum>
         </property>
         <property name="format">
-         <string>%p of %m matrixes</string>
+         <string>%v of %m matrixes</string>
         </property>
        </widget>
       </item>

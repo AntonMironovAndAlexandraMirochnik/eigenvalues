@@ -10,7 +10,14 @@ EigenvaluesAlgorithmController::EigenvaluesAlgorithmController(QObject *parent) 
     computePushButtonReadyText = tr("Compute");
     computePushButtonComputingText = tr("Computing...");
     setupWidget();
+    connect(&futureWatcher, SIGNAL(finished()), this, SLOT(finished()));
+    connect(&futureWatcher, SIGNAL(finished()), this, SLOT(updateUi()));
+    connect(&futureWatcher, SIGNAL(canceled()), this, SLOT(updateUi()));
 
+    connect(ui()->computePushButton, SIGNAL(pressed()), this, SLOT(compute()));
+    connect(ui()->setupMatrixPushButton, SIGNAL(pressed()), this, SLOT(setupMatrix()));
+    connect(ui()->randomizeMatrixPushButton, SIGNAL(pressed()), this, SLOT(randomizeMatrix()));
+    connect(ui()->initialMatrixTableView, SIGNAL(modelChanged()), this, SLOT(initialMatrixTableViewModelChanged()));
 }
 
 EigenvaluesAlgorithmController::~EigenvaluesAlgorithmController()
@@ -32,8 +39,8 @@ QWidget* EigenvaluesAlgorithmController::widget() const
 void EigenvaluesAlgorithmController::setupWidget()
 {
     {
-	_widget = new QWidget();
-	_ui = new Ui::EigenvaluesWidget();
+        _widget = new QWidget();
+        _ui = new Ui::EigenvaluesWidget();
     }
 
     ui()->setupUi(widget());
@@ -42,21 +49,14 @@ void EigenvaluesAlgorithmController::setupWidget()
     ui()->initialMatrixTableView->setOpeningEnabled(true);
     ui()->initialMatrixTableView->setSaveingEnabled(true);
     ui()->resultMatrixTableView->setSaveingEnabled(true);
-
-    connect(ui()->computePushButton, SIGNAL(pressed()), this, SLOT(compute()));
-    connect(ui()->setupMatrixPushButton, SIGNAL(pressed()), this, SLOT(setupMatrix()));
-    connect(ui()->randomizeMatrixPushButton, SIGNAL(pressed()), this, SLOT(randomizeMatrix()));
-    connect(ui()->initialMatrixTableView, SIGNAL(modelChanged()), this, SLOT(initialMatrixTableViewModelChanged()));
-
-    connect(this, SIGNAL(taskStartedSignal(EigenvaluesTask*)), this, SLOT(taskDidStart(EigenvaluesTask*)));
-    connect(this, SIGNAL(taskFinishedSignal(EigenvaluesTask*)), this, SLOT(taskDidFinish(EigenvaluesTask*)));
 }
 
 void EigenvaluesAlgorithmController::compute()
 {
     MatrixModel* model = (MatrixModel*) ui()->initialMatrixTableView->model();
     EigenvaluesTask* task = generateTask(*(model->matrix()), ui()->calculationAccuracySpinBox->value());
-    task->execute(this);
+
+    futureWatcher.setFuture(QtConcurrent::run(task, &EigenvaluesTask::solve));
 }
 
 void EigenvaluesAlgorithmController::setupMatrix()
@@ -93,7 +93,7 @@ void EigenvaluesAlgorithmController::randomizeMatrix()
     else
     {
 	EditableMatrix *matrix = new EditableMatrix(*oldModel->matrix(), N, N);
-	matrix->randomizeValues();
+    matrix->randomizeSymmetricValues();
 	model = new MatrixModel(matrix);
 	oldModel->deleteLater();
     }
@@ -101,56 +101,26 @@ void EigenvaluesAlgorithmController::randomizeMatrix()
     ui()->initialMatrixTableView->setModel(model);
 }
 
-void EigenvaluesAlgorithmController::taskStarted(Task *task)
-{
-    emit taskStartedSignal((EigenvaluesTask *)task);
-}
-
-void EigenvaluesAlgorithmController::taskFinished(Task *task)
-{
-    emit taskFinishedSignal((EigenvaluesTask *)task);
-}
-
 void EigenvaluesAlgorithmController::initialMatrixTableViewModelChanged()
 {
     ui()->computePushButton->setEnabled(true);
 }
 
-
-void EigenvaluesAlgorithmController::taskDidStart(EigenvaluesTask *task)
+void EigenvaluesAlgorithmController::finished()
 {
-    setProcessing(true);
-}
+    EigenvaluesResult result = futureWatcher.result();
+    ui()->resultAccuracy->setText(tr("%1").arg(result.accuracy()));
+    ui()->computingTimeLineEdit->setText(tr("%1").arg(result.completionTime()));
+    ui()->iterationsNumberLineEdit->setText(tr("%1").arg(result.iterationsNumber()));
 
-void EigenvaluesAlgorithmController::taskDidFinish(EigenvaluesTask *task)
-{
-    if (task->isDone())
-    {
-	ui()->resultAccuracy->setText(tr("%1").arg(task->resultAccuracy()));
-	ui()->computingTimeLineEdit->setText(tr("%1").arg(task->computationTime()));
-	ui()->iterationsNumberLineEdit->setText(tr("%1").arg(task->iterationsNumber()));
-
-	MatrixModel *resultModel = new MatrixModel(new Matrix(task->eigenvalues()), ui()->resultMatrixTableView);
+    MatrixModel *resultModel = new MatrixModel(new Matrix(result.matrix()), ui()->resultMatrixTableView);
 	ui()->resultMatrixTableView->setModel(resultModel);
-    }
-    else
-    {
-	QMessageBox::warning(widget(), tr("Error"), tr("Solution is not found"));
-    }
-
-    delete task;
-
-    setProcessing(false);
 }
 
-bool EigenvaluesAlgorithmController::isProcessing() const
+void EigenvaluesAlgorithmController::updateUi()
 {
-    return _isProcessing;
-}
+    bool isProcessing = futureWatcher.isRunning();
 
-void EigenvaluesAlgorithmController::setProcessing(bool isProcessing)
-{
-    _isProcessing = isProcessing;
     ui()->initialMatrixTableView->setEnabled(!isProcessing);
     ui()->resultMatrixTableView->setEnabled(!isProcessing);
     ui()->matrixDimentionSpinBox->setEnabled(!isProcessing);
@@ -161,13 +131,23 @@ void EigenvaluesAlgorithmController::setProcessing(bool isProcessing)
     ui()->computePushButton->setEnabled(!isProcessing);
     if (isProcessing)
     {
-	ui()->computePushButton->setText(computePushButtonComputingText);
-	ui()->resultAccuracy->setText(tr("Computing..."));
-	ui()->computingTimeLineEdit->setText(tr("Computing..."));
-	ui()->iterationsNumberLineEdit->setText(tr("Computing..."));
+        ui()->computePushButton->setText(computePushButtonComputingText);
+        ui()->resultAccuracy->setText(tr("Computing..."));
+        ui()->computingTimeLineEdit->setText(tr("Computing..."));
+        ui()->iterationsNumberLineEdit->setText(tr("Computing..."));
     }
     else
     {
-	ui()->computePushButton->setText(computePushButtonReadyText);
+        ui()->computePushButton->setText(computePushButtonReadyText);
     }
+}
+
+TaskType EigenvaluesAlgorithmController::taskType() const
+{
+    return InvalidTaskType;
+}
+
+EigenvaluesTask* EigenvaluesAlgorithmController::generateTask(const Matrix &initialMatrix, int computationAccuracy)
+{
+    return new EigenvaluesTask(initialMatrix, computationAccuracy, taskType());
 }

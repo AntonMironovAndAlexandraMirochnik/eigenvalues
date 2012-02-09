@@ -56,7 +56,7 @@ void EigenvaluesAlgorithmController::compute()
     MatrixModel* model = (MatrixModel*) ui()->initialMatrixTableView->model();
     EigenvaluesTask* task = generateTask(*(model->matrix()), ui()->calculationAccuracySpinBox->value());
 
-    futureWatcher.setFuture(QtConcurrent::run(task, &EigenvaluesTask::solve));
+    futureWatcher.setFuture(QtConcurrent::run<EigenvaluesResult>(task, &EigenvaluesTask::solve));
 }
 
 void EigenvaluesAlgorithmController::setupMatrix()

@@ -145,7 +145,7 @@ Matrix::Element Matrix::maximalNondiagonalElementIndex()
     Index i, j;
     MatrixElement value;
 
-    Index maxI, maxJ;
+    Index maxI = 0, maxJ = 0;
     MatrixElement maxValue = 0;
 
     for (i = 0; i < N(); ++i)
@@ -186,15 +186,15 @@ bool Matrix::isSymmetric()
 	Index i, j;
 	for (i = 0; i < N(); ++i)
 	{
-        for (j = i + 1; j < N(); ++j)
+	for (j = i + 1; j < N(); ++j)
 	    {
-            MatrixElement a = element(i, j);
-            MatrixElement b = element(j, i);
-            if (!qFuzzyCompare(a, b))
-            {
-                isSymmetric = false;
-                break;
-            }
+	    MatrixElement a = element(i, j);
+	    MatrixElement b = element(j, i);
+	    if (!qFuzzyCompare(a, b))
+	    {
+		isSymmetric = false;
+		break;
+	    }
 	    }
 	}
 	if (isSymmetric)

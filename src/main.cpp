@@ -12,6 +12,10 @@ int main(int argc, char** argv)
         application->setApplicationName("Eigenvalues");
         application->setApplicationVersion(APPLICATION_VERSION);
         application->setWindowIcon(QIcon(":/images/logo"));
+
+        QTranslator *translator = new QTranslator();
+        translator->load(":/lang/ru");
+        application->installTranslator(translator);
     }
 
     //initialization of main controller

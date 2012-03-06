@@ -29,7 +29,7 @@ void MatrixTableView::setModel(MatrixModel *model)
     int M = model->matrix()->M();
     for (int i = 0; i < M; ++i)
     {
-        setColumnWidth(i, rowHeight(i) + 20);
+    setColumnWidth(i + 10, rowHeight(i) + 1);
     }
     emit modelChanged();
 }

@@ -3,6 +3,7 @@
 
 #include "model/matrix/matrix_globals.h"
 #include "model/matrix/matrix_private.h"
+#include "constants.h"
 
 class QString;
 
@@ -51,8 +52,8 @@ public:
 
     static void solveLinearByGauss(Matrix &A, Matrix &B);
 
-    virtual QString toString() const;
-    virtual void saveToFile(QString fileName) const;
+    virtual QString toString(int precision = MatrixExportPrec) const;
+    virtual void saveToFile(QString fileName, int precision = MatrixExportPrec) const;
 
     friend Matrix operator *(const Matrix& A, const Matrix& B);
     friend Matrix operator -(const Matrix& A, const Matrix& B);

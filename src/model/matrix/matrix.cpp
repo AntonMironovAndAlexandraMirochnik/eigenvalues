@@ -205,16 +205,16 @@ bool Matrix::isSymmetric()
     return (matrixPrivate.matrixFlags & MatrixFlagIsSymmetric);
 }
 
-QString Matrix::toString() const
+QString Matrix::toString(int precision) const
 {
     QString result;
     Index i, j;
     QString numberTemplate("\t%1");
-#define addNumber(number) result += numberTemplate.arg(number, 0, 'g', MatrixExportPrec, QChar())
+#define addNumber(number) result += numberTemplate.arg(number, 0, 'g', precision, QChar())
 
     result += numberTemplate.arg(M());
     result += numberTemplate.arg(N());
-    result += "\r\n";
+    result += "\n";
 
     for (i = 0; i < M(); ++i)
     {
@@ -222,17 +222,17 @@ QString Matrix::toString() const
 	{
 	    addNumber(element(i, j));
 	}
-	result += "\r\n";
+	result += "\n";
     }
 #undef addNumber
     return result;
 }
 
-void Matrix::saveToFile(QString fileName) const
+void Matrix::saveToFile(QString fileName, int precision) const
 {
     QFile file(fileName);
     file.open(QFile::WriteOnly);
-    file.write(toString().toLocal8Bit());
+    file.write(toString(precision).toLocal8Bit());
 }
 
 

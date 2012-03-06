@@ -14,7 +14,7 @@ EigenvaluesResult solveWithQR(const EigenvaluesTask &task)
     Matrix A(task.matrix());
     Index i, j;
 
-    for (j = 1; j < A.N(); j++)
+    for (j = 1; j < A.N() - 1; j++)
     {
         for (i = j + 1; i < A.N(); i++)
         {
@@ -41,29 +41,29 @@ EigenvaluesResult solveWithQR(const EigenvaluesTask &task)
         ++iterationsNumber;
         Matrix R(A);
         Matrix Q(*Matrix::MatrixIdentical(A.N(), A.N()));
-        for (j = 0; j < A.N(); j++)
-        {
-            for (i = j + 1; j < A.N(); j++)
+        for (i = 0; i < A.N() - 1; i++)
             {
-                MatrixElement s, c;
+                for (j = i + 1; j < A.N(); j++)
+                    {
+                        MatrixElement s, c;
 
-                MatrixElement a_ii = A.element(i, i);
-                MatrixElement a_ji = A.element(j, i);
-                MatrixElement div = qSqrt(qPow(a_ii, 2) + qPow(a_ji, 2));
+                        MatrixElement a_ii = R.element(i, i);
+                        MatrixElement a_ji = R.element(j, i);
+                        MatrixElement div = qSqrt(qPow(a_ii, 2) + qPow(a_ji, 2));
 
-                s = a_ji / div;
-                c = a_ii / div;
+                        s = a_ji / div;
+                        c = a_ii / div;
 
-                EditableMatrix T(*Matrix::MatrixIdentical(A.N(), A.N()));
-                T.element(i, i) = c;
-                T.element(i, j) = -s;
-                T.element(j, i) = s;
-                T.element(j, j) = c;
+                        EditableMatrix T(*Matrix::MatrixIdentical(A.N(), A.N()));
+                        T.element(i, i) = c;
+                        T.element(i, j) = -s;
+                        T.element(j, i) = s;
+                        T.element(j, j) = c;
 
-                R = T * R;
-                Q = Q * T.transposed();
+                        R = T.transposed() * R;
+                        Q = Q * T;
+                    }
             }
-        }
         A = R * Q;
     }
 

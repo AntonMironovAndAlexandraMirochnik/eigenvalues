@@ -1,6 +1,7 @@
 #include "matrix.h"
 #include "matrix_private.h"
 #include <QtCore>
+#include "constants.h"
 
 Matrix::Matrix(const MatrixPrivate &privateData)
 {
@@ -209,7 +210,7 @@ QString Matrix::toString() const
     QString result;
     Index i, j;
     QString numberTemplate("\t%1");
-#define addNumber(number) result += numberTemplate.arg(number, 0, 'g', 3, QChar())
+#define addNumber(number) result += numberTemplate.arg(number, 0, 'g', MatrixExportPrec, QChar())
 
     result += numberTemplate.arg(M());
     result += numberTemplate.arg(N());

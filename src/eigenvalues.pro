@@ -16,7 +16,9 @@ HEADERS += \
     controller/qr_algorithm_controller.h \
     controller/jacobi_algorithm_controller.h \
     model/tasks/eigenvalues_task.h \
-    controller/comparation_controller.h
+    controller/comparation_controller.h \
+    model/matrix_wrapper/matrix_table_item_delegate.h \
+    constants.h
 
 SOURCES += \
     model/matrix/matrix_solve_linear.cpp \
@@ -34,7 +36,8 @@ SOURCES += \
     model/tasks/eigenvalues_task.cpp \
     model/tasks/qr_task.cpp \
     model/tasks/jacobi_task.cpp \
-    controller/comparation_controller.cpp
+    controller/comparation_controller.cpp \
+    model/matrix_wrapper/matrix_table_item_delegate.cpp
 
 VERSION = 0.0.3.0
 

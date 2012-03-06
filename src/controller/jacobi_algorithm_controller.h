@@ -10,6 +10,8 @@ class JacobiAlgorithmController : public EigenvaluesAlgorithmController
 public:
     explicit JacobiAlgorithmController(QObject *parent = 0);
     virtual TaskType taskType() const;
+public slots:
+    virtual void compute();
 };
 
 #endif // JACOBI_ALGORITHM_CONTROLLER_H

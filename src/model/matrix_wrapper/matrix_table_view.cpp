@@ -1,6 +1,7 @@
 #include "matrix_table_view.h"
 #include "model/matrix/editable_matrix.h"
 #include "matrix_model.h"
+#include "matrix_table_item_delegate.h"
 
 MatrixTableView::MatrixTableView(QWidget *parent) :
     QTableView(parent)
@@ -14,6 +15,7 @@ MatrixTableView::MatrixTableView(QWidget *parent) :
 
     setOpeningEnabled(false);
     setSaveingEnabled(true);
+    setItemDelegate(new MatrixTableItemDelegate(this));
 }
 
 MatrixTableView::~MatrixTableView()
@@ -27,7 +29,7 @@ void MatrixTableView::setModel(MatrixModel *model)
     int M = model->matrix()->M();
     for (int i = 0; i < M; ++i)
     {
-	setColumnWidth(i, rowHeight(i) + 20);
+        setColumnWidth(i, rowHeight(i) + 20);
     }
     emit modelChanged();
 }

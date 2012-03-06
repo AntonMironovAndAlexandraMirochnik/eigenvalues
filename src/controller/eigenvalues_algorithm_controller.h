@@ -34,12 +34,15 @@ public:
     virtual TaskType taskType() const;
 
 private slots:
-    void compute();
     void setupMatrix();
     void randomizeMatrix();
     void initialMatrixTableViewModelChanged();
     void finished();
     void updateUi();
+
+protected slots:
+    virtual void compute();
+
 };
 
 #endif // EIGENVALUESALGORITHMCONTROLLER_H

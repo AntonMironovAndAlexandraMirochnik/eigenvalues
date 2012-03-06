@@ -1,6 +1,7 @@
 #include "matrix.h"
 #include "editable_matrix.h"
 #include "matrix_private.h"
+#include "constants.h"
 
 EditableMatrix::EditableMatrix(const EditableMatrix& matrixToCopy)
     : Matrix(matrixToCopy)
@@ -188,7 +189,7 @@ QString EditableMatrix::toString() const
     QString result;
     Index i, j;
     QString numberTemplate("\t%1");
-#define addNumber(number) result += numberTemplate.arg(number, 0, 'f', 2, QChar())
+#define addNumber(number) result += numberTemplate.arg(number, 0, 'f', MatrixExportPrec, QChar())
 
     addNumber(M());
     addNumber(N());

@@ -214,7 +214,7 @@ QString Matrix::toString() const
 
     result += numberTemplate.arg(M());
     result += numberTemplate.arg(N());
-    result += "\n";
+    result += "\r\n";
 
     for (i = 0; i < M(); ++i)
     {
@@ -222,7 +222,7 @@ QString Matrix::toString() const
 	{
 	    addNumber(element(i, j));
 	}
-	result += "\n";
+	result += "\r\n";
     }
 #undef addNumber
     return result;

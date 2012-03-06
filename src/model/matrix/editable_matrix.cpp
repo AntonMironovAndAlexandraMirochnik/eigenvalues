@@ -191,9 +191,9 @@ QString EditableMatrix::toString() const
     QString numberTemplate("\t%1");
 #define addNumber(number) result += numberTemplate.arg(number, 0, 'f', MatrixExportPrec, QChar())
 
-    addNumber(M());
-    addNumber(N());
-    result += "\n";
+    result += numberTemplate.arg(M());
+    result += numberTemplate.arg(N());
+    result += "\r\n";
 
     for (i = 0; i < M(); ++i)
     {
@@ -201,7 +201,7 @@ QString EditableMatrix::toString() const
 	{
 	    addNumber(element(i, j));
 	}
-	result += "\n";
+	result += "\r\n";
     }
 #undef addNumber
     return result;

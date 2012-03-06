@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0">
+<TS version="2.0" language="en">
 <context>
     <name></name>
     <message id="Not enough text parameters">
@@ -17,12 +17,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message id="Bad dimentions for mult">
-        <location filename="../model/matrix/matrix.cpp" line="172"/>
+        <location filename="../model/matrix/matrix.cpp" line="254"/>
         <source></source>
         <translation type="unfinished"></translation>
     </message>
     <message id="Bad dimentions for dif">
-        <location filename="../model/matrix/matrix.cpp" line="178"/>
+        <location filename="../model/matrix/matrix.cpp" line="260"/>
         <source></source>
         <translation type="unfinished"></translation>
     </message>
@@ -55,22 +55,12 @@
 <context>
     <name>ComparationController</name>
     <message>
-        <location filename="../controller/comparation_controller.cpp" line="122"/>
-        <source>Error</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../controller/comparation_controller.cpp" line="122"/>
-        <source>Solution is not found</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../controller/comparation_controller.cpp" line="143"/>
-        <location filename="../controller/comparation_controller.cpp" line="144"/>
-        <location filename="../controller/comparation_controller.cpp" line="145"/>
-        <location filename="../controller/comparation_controller.cpp" line="149"/>
-        <location filename="../controller/comparation_controller.cpp" line="150"/>
-        <location filename="../controller/comparation_controller.cpp" line="151"/>
+        <location filename="../controller/comparation_controller.cpp" line="130"/>
+        <location filename="../controller/comparation_controller.cpp" line="131"/>
+        <location filename="../controller/comparation_controller.cpp" line="132"/>
+        <location filename="../controller/comparation_controller.cpp" line="137"/>
+        <location filename="../controller/comparation_controller.cpp" line="138"/>
+        <location filename="../controller/comparation_controller.cpp" line="139"/>
         <source>%1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -85,12 +75,12 @@
     <message>
         <location filename="../ui/comparation_widget.ui" line="23"/>
         <source>Input data</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Input data</translation>
     </message>
     <message>
         <location filename="../ui/comparation_widget.ui" line="35"/>
         <source>Matrix dimension</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/comparation_widget.ui" line="68"/>
@@ -122,7 +112,7 @@
     <message>
         <location filename="../ui/comparation_widget.ui" line="157"/>
         <location filename="../ui/comparation_widget.ui" line="229"/>
-        <source>%p of %m matrixes</source>
+        <source>%v of %m matrixes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -156,28 +146,18 @@
     </message>
     <message>
         <location filename="../controller/eigenvalues_algorithm_controller.cpp" line="11"/>
-        <location filename="../controller/eigenvalues_algorithm_controller.cpp" line="117"/>
-        <location filename="../controller/eigenvalues_algorithm_controller.cpp" line="118"/>
-        <location filename="../controller/eigenvalues_algorithm_controller.cpp" line="119"/>
+        <location filename="../controller/eigenvalues_algorithm_controller.cpp" line="135"/>
+        <location filename="../controller/eigenvalues_algorithm_controller.cpp" line="136"/>
+        <location filename="../controller/eigenvalues_algorithm_controller.cpp" line="137"/>
         <source>Computing...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../controller/eigenvalues_algorithm_controller.cpp" line="136"/>
-        <location filename="../controller/eigenvalues_algorithm_controller.cpp" line="137"/>
-        <location filename="../controller/eigenvalues_algorithm_controller.cpp" line="138"/>
+        <location filename="../controller/eigenvalues_algorithm_controller.cpp" line="112"/>
+        <location filename="../controller/eigenvalues_algorithm_controller.cpp" line="113"/>
+        <location filename="../controller/eigenvalues_algorithm_controller.cpp" line="114"/>
         <source>%1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../controller/eigenvalues_algorithm_controller.cpp" line="145"/>
-        <source>Error</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../controller/eigenvalues_algorithm_controller.cpp" line="145"/>
-        <source>Solution is not found</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -203,47 +183,47 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/eigenvalues_widget.ui" line="160"/>
+        <location filename="../ui/eigenvalues_widget.ui" line="163"/>
         <source>Calculation accuracy</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/eigenvalues_widget.ui" line="186"/>
+        <location filename="../ui/eigenvalues_widget.ui" line="189"/>
         <source>Randomize Matrix</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/eigenvalues_widget.ui" line="211"/>
+        <location filename="../ui/eigenvalues_widget.ui" line="214"/>
         <source>Setup Matrix</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/eigenvalues_widget.ui" line="230"/>
+        <location filename="../ui/eigenvalues_widget.ui" line="233"/>
         <source>Output</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/eigenvalues_widget.ui" line="242"/>
+        <location filename="../ui/eigenvalues_widget.ui" line="245"/>
         <source>Eigenvalues</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/eigenvalues_widget.ui" line="288"/>
+        <location filename="../ui/eigenvalues_widget.ui" line="291"/>
         <source>Iterations number</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/eigenvalues_widget.ui" line="302"/>
+        <location filename="../ui/eigenvalues_widget.ui" line="305"/>
         <source>Result accuracy</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/eigenvalues_widget.ui" line="316"/>
+        <location filename="../ui/eigenvalues_widget.ui" line="319"/>
         <source>Computing time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/eigenvalues_widget.ui" line="350"/>
+        <location filename="../ui/eigenvalues_widget.ui" line="353"/>
         <source>Compute</source>
         <translation type="unfinished"></translation>
     </message>
@@ -251,7 +231,7 @@
 <context>
     <name>JacobiAlgorithmController</name>
     <message>
-        <location filename="../controller/jacobi_algorithm_controller.cpp" line="7"/>
+        <location filename="../controller/jacobi_algorithm_controller.cpp" line="9"/>
         <source>Jakobi algorithm</source>
         <translation type="unfinished"></translation>
     </message>
@@ -277,48 +257,48 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../model/matrix_wrapper/matrix_table_view.cpp" line="62"/>
+        <location filename="../model/matrix_wrapper/matrix_table_view.cpp" line="63"/>
         <source>Open Matrix</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../model/matrix_wrapper/matrix_table_view.cpp" line="62"/>
-        <location filename="../model/matrix_wrapper/matrix_table_view.cpp" line="84"/>
+        <location filename="../model/matrix_wrapper/matrix_table_view.cpp" line="63"/>
+        <location filename="../model/matrix_wrapper/matrix_table_view.cpp" line="85"/>
         <source>Text Files (*.txt)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../model/matrix_wrapper/matrix_table_view.cpp" line="68"/>
+        <location filename="../model/matrix_wrapper/matrix_table_view.cpp" line="69"/>
         <source>Opening file failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../model/matrix_wrapper/matrix_table_view.cpp" line="75"/>
+        <location filename="../model/matrix_wrapper/matrix_table_view.cpp" line="76"/>
         <source>File opening error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../model/matrix_wrapper/matrix_table_view.cpp" line="75"/>
+        <location filename="../model/matrix_wrapper/matrix_table_view.cpp" line="76"/>
         <source>Failed to load matrix from file %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../model/matrix_wrapper/matrix_table_view.cpp" line="84"/>
+        <location filename="../model/matrix_wrapper/matrix_table_view.cpp" line="85"/>
         <source>Save Matrix</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../model/matrix_wrapper/matrix_table_view.cpp" line="90"/>
+        <location filename="../model/matrix_wrapper/matrix_table_view.cpp" line="91"/>
         <source>Saving file failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../model/matrix_wrapper/matrix_table_view.cpp" line="96"/>
+        <location filename="../model/matrix_wrapper/matrix_table_view.cpp" line="97"/>
         <source>File saving error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../model/matrix_wrapper/matrix_table_view.cpp" line="96"/>
+        <location filename="../model/matrix_wrapper/matrix_table_view.cpp" line="97"/>
         <source>Failed to save matrix to file %1.</source>
         <translation type="unfinished"></translation>
     </message>

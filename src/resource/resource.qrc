@@ -6,4 +6,8 @@
         <file alias="setup">setup.png</file>
         <file alias="stop">stop.png</file>
     </qresource>
+    <qresource prefix="/lang">
+        <file alias="en">en.qm</file>
+        <file alias="ru">ru.qm</file>
+    </qresource>
 </RCC>
